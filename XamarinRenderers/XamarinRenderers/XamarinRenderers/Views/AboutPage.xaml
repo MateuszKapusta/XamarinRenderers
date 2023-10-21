@@ -11,13 +11,22 @@
     </ContentPage.BindingContext>
 
     <StackLayout>
+        <Label Text="Numeric Entry" 
+               FontSize="Medium"
+               HorizontalOptions="Center"/>
         <Label Text="String" />
-        <controls:NumericEntry  Text="{Binding NumericString}"
-                                Placeholder="String" />
+        <controls:NumericEntry x:Name="NumberInt"
+                               Text="{Binding NumericString}"
+                               Placeholder="String"
+                               NumericType="Natural" />
         <Label Text="Int" />
-        <controls:NumericEntry Text="{Binding NumericInt}"
-                               Placeholder="Int" />
+        <controls:NumericEntry x:Name="NumberString"
+                               Text="{Binding NumericInt}"
+                               Placeholder="Int"
+                               NumericType="Integers" />
         <Button Command="{Binding TestCommand}" />
+
+        <Button Clicked="Button_Clicked" />
     </StackLayout>
 
 </ContentPage>

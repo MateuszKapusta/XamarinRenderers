@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,16 +14,19 @@ namespace XamarinRenderers.UWP.Renderers
 {
     public class NumericEntryRenderer : EntryRenderer
     {
+        protected NumericEntryType Type { get; set; }
 
         protected override void OnElementChanged(ElementChangedEventArgs<Entry> e)
         {
             base.OnElementChanged(e);
 
-            if (e.NewElement != null)
+            if (e.NewElement != null
+                && e.NewElement is NumericEntry numericEntry)
             {
                 if (Control != null)
                 {
-                    Control.Text = "0";
+                    Type = numericEntry.NumericType;
+                    ResetDefaultValue();
                     Control.BeforeTextChanging += Control_BeforeTextChanging;
                     Control.TextChanging += Control_TextChanging;
                 }
@@ -34,6 +38,32 @@ namespace XamarinRenderers.UWP.Renderers
                 Control.TextChanging -= Control_TextChanging;
             }
         }
+
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
+
+            if (string.Equals(e.PropertyName, nameof(NumericEntry.NumericTypeProperty))
+                && sender is NumericEntry numericEntry)
+            {
+                Type = numericEntry.NumericType;
+            }
+        }
+
+        private void ResetDefaultValue()
+        {
+            switch (Type)
+            {
+                case NumericEntryType.Natural:
+                case NumericEntryType.Integers:
+                    Control.Text = "0";
+                    break;
+                case NumericEntryType.Fractional:
+                    Control.Text = "0.0";
+                    break;
+            }
+        }
+
 
         private void Control_TextChanging(Windows.UI.Xaml.Controls.TextBox sender, Windows.UI.Xaml.Controls.TextBoxTextChangingEventArgs args)
         {

@@ -12,6 +12,14 @@ namespace XamarinRenderers.Controls
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class NumericEntry : Entry
     {
+        public static readonly BindableProperty NumericTypeProperty = BindableProperty.Create(nameof(NumericTypeProperty), typeof(NumericEntryType), typeof(NumericEntry), NumericEntryType.Integers);
+
+        public NumericEntryType NumericType
+        {
+            get { return (NumericEntryType)GetValue(NumericTypeProperty);}
+            set { SetValue(NumericTypeProperty, value);}
+        }
+
         public NumericEntry()
         {
             InitializeComponent();

@@ -11,5 +11,11 @@ namespace XamarinRenderers.Views
         {
             InitializeComponent();
         }
+
+        private void Button_Clicked(object sender, EventArgs e)
+        {
+            NumberString.NumericType = Controls.NumericEntryType.Fractional;
+            NumberInt.NumericType = Controls.NumericEntryType.Fractional;
+        }
     }
 }
