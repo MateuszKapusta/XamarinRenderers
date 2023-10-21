@@ -42,16 +42,16 @@ namespace XamarinRenderers.UWP.Renderers
                 Control.Text = "0";
             }
 
-            if (sender.Text.Length >= 2 && sender.Text.First() == '0')
-            {   //We have to change value to refresh it
-                Control.Text = sender.Text;
+            if (sender.Text.Length == 2 && sender.Text.First() == '0')
+            {
                 Control.Text = sender.Text.Substring(1);
             }
         }
 
         private void Control_BeforeTextChanging(Windows.UI.Xaml.Controls.TextBox sender, Windows.UI.Xaml.Controls.TextBoxBeforeTextChangingEventArgs args)
         {
-            if (int.TryParse(args.NewText, out int value))
+            if (int.TryParse(args.NewText, out int value)
+                && (args.NewText.First() != '0' || Control.Text == "0"))
             {
                 return;
             }
