@@ -10,5 +10,14 @@
         <vm:AboutViewModel />
     </ContentPage.BindingContext>
 
+    <StackLayout>
+        <Label Text="String" />
+        <controls:NumericEntry  Text="{Binding NumericString}"
+                                Placeholder="String" />
+        <Label Text="Int" />
+        <controls:NumericEntry Text="{Binding NumericInt}"
+                               Placeholder="Int" />
+        <Button Command="{Binding TestCommand}" />
+    </StackLayout>
 
 </ContentPage>
