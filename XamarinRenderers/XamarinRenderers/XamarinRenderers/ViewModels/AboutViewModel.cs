@@ -24,16 +24,30 @@ namespace XamarinRenderers.ViewModels
             }
         }
 
-        private int _numericInt;
-        public int NumericInt
+        private long _numericLong;
+        public long NumericLong
         {
             get
             {
-                return _numericInt;
+                return _numericLong;
             }
             set
             {
-                _numericInt = value;
+                _numericLong = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private decimal _numericDecimal;
+        public decimal NumericDecimal
+        {
+            get
+            {
+                return _numericDecimal;
+            }
+            set
+            {
+                _numericDecimal = value;
                 OnPropertyChanged();
             }
         }
