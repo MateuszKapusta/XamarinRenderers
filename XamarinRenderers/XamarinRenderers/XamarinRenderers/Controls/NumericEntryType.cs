@@ -8,7 +8,7 @@ namespace XamarinRenderers.Controls
     {
         LongValue,
         LongPositiveValue,
-        DoubleValue,
-        DoublePositiveValue,
+        DecimalValue,
+        DecimalPositiveValue,
     }
 }

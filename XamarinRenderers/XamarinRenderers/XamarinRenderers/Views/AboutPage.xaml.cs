@@ -18,7 +18,7 @@ namespace XamarinRenderers.Views
             var number = NumberString.NumericType;
             number++;
 
-            if(number > Controls.NumericEntryType.DoublePositiveValue)
+            if(number > Controls.NumericEntryType.DecimalPositiveValue)
             {
                 number = 0;
             }

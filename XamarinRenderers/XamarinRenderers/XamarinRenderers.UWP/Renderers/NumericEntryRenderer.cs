@@ -16,6 +16,8 @@ namespace XamarinRenderers.UWP.Renderers
     public class NumericEntryRenderer : EntryRenderer
     {
         protected NumericEntryType Type { get; set; }
+        private int ControlOldPosition;
+
 
         protected override void OnElementChanged(ElementChangedEventArgs<Entry> e)
         {
@@ -29,6 +31,7 @@ namespace XamarinRenderers.UWP.Renderers
                     Type = numericEntry.NumericType;
                     ResetDefaultValue();
                     Control.TextChanging += Control_TextChanging;
+                    Control.SelectionChanging += Control_SelectionChanging;
                 }
             }
 
@@ -37,8 +40,17 @@ namespace XamarinRenderers.UWP.Renderers
                 if (Control != null)
                 {
                     Control.TextChanging -= Control_TextChanging;
+                    Control.SelectionChanging -= Control_SelectionChanging;
                 }
             }
+        }
+
+
+
+
+        private void Control_SelectionChanging(TextBox sender, TextBoxSelectionChangingEventArgs args)
+        {
+            ControlOldPosition = sender.SelectionStart + sender.SelectionLength;
         }
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -61,12 +73,13 @@ namespace XamarinRenderers.UWP.Renderers
                 case NumericEntryType.LongPositiveValue:
                     Control.Text = "0";
                     break;
-                case NumericEntryType.DoubleValue:
-                case NumericEntryType.DoublePositiveValue:
+                case NumericEntryType.DecimalValue:
+                case NumericEntryType.DecimalPositiveValue:
                     Control.Text = "0.0";
                     break;
             }
         }
+
 
         private void Control_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
@@ -78,11 +91,11 @@ namespace XamarinRenderers.UWP.Renderers
                 case NumericEntryType.LongPositiveValue:
                     LongPositiveTextChanging(sender, args);
                     break;
-                case NumericEntryType.DoubleValue:
-                    DoubleTextChanging(sender, args);
+                case NumericEntryType.DecimalValue:
+                    DecimalTextChanging(sender, args);
                     break;
-                case NumericEntryType.DoublePositiveValue:
-                    DoublePositiveTextChanging(sender, args);
+                case NumericEntryType.DecimalPositiveValue:
+                    DecimalPositiveTextChanging(sender, args);
                     break;
             }
         }
@@ -100,67 +113,58 @@ namespace XamarinRenderers.UWP.Renderers
 
             if (long.TryParse(sender.Text, out long value))
             {
-                if (sender.Text.First() == '0'
-                    || sender.Text.StartsWith("-0")
-                    || sender.Text.Contains(" "))
-                {
-                    sender.Text = value.ToString();
-                    sender.Select(sender.Text.Length, 0);
-                    return;
-                }
-
+                var senderPositionTmp = sender.SelectionStart + sender.SelectionLength;
+                var cleanValue = value.ToString();
+                sender.Text = cleanValue;
+                sender.SelectionStart = cleanValue.Length < senderPositionTmp ? cleanValue.Length : senderPositionTmp;
                 return;
             }
 
             if (string.IsNullOrEmpty(sender.Text))
             {
                 sender.Text = "0";
-                sender.Select(sender.Text.Length, 0);
+                sender.SelectionStart = 1;
                 return;
             }
 
             sender.Text = Control.Text;
-            sender.Select(Control.Text.Length, 0);
+            sender.SelectionStart = ControlOldPosition - 1;
         }
 
 
         private void LongPositiveTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
+
             if (long.TryParse(sender.Text, out long value)
                 && value >= 0)
             {
-                if (sender.Text.First() == '0'
-                    || sender.Text == "-0"
-                    || sender.Text.Contains(" "))
-                {
-                    sender.Text = value.ToString();
-                    sender.Select(sender.Text.Length, 0);
-                    return;
-                }
-
+                var senderPositionTmp = sender.SelectionStart + sender.SelectionLength;
+                var cleanValue = value.ToString();
+                sender.Text = cleanValue;
+                sender.SelectionStart = cleanValue.Length < senderPositionTmp ? cleanValue.Length : senderPositionTmp;
                 return;
             }
 
             if (string.IsNullOrEmpty(sender.Text))
             {
                 sender.Text = "0";
-                sender.Select(sender.Text.Length, 0);
+                sender.SelectionStart = 1;
                 return;
             }
 
             sender.Text = Control.Text;
-            sender.Select(Control.Text.Length, 0);
+            sender.SelectionStart = ControlOldPosition - 1;
         }
 
 
-        private void DoubleTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        private void DecimalTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
 
         }
 
-        private void DoublePositiveTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        private void DecimalPositiveTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
-            if (Double.TryParse(sender.Text, out double value)
+            if (decimal.TryParse(sender.Text, out decimal value)
                 && value >= 0)
             {
                 if ((sender.Text.First() == '0' && sender.Text.Length >= 2 && sender.Text[1] != '.')
