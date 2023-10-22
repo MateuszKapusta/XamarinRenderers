@@ -24,7 +24,9 @@ namespace XamarinRenderers.Views
             }
 
             NumberString.NumericType = number;
-            NumberInt.NumericType = number;
+            NumberLong.NumericType = number;
+            NumberDecimal.NumericType = number;
+
             EntryTypeButton.Text = number.ToString();
         }
     }
