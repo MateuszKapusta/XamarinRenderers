@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Controls;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.UWP;
 using XamarinRenderers.Controls;
@@ -27,15 +28,16 @@ namespace XamarinRenderers.UWP.Renderers
                 {
                     Type = numericEntry.NumericType;
                     ResetDefaultValue();
-                    Control.BeforeTextChanging += Control_BeforeTextChanging;
                     Control.TextChanging += Control_TextChanging;
                 }
             }
 
             if (e.OldElement != null)
             {
-                Control.BeforeTextChanging -= Control_BeforeTextChanging;
-                Control.TextChanging -= Control_TextChanging;
+                if (Control != null)
+                {
+                    Control.TextChanging -= Control_TextChanging;
+                }
             }
         }
 
@@ -55,7 +57,7 @@ namespace XamarinRenderers.UWP.Renderers
             switch (Type)
             {
                 case NumericEntryType.Natural:
-                case NumericEntryType.Integers:
+                case NumericEntryType.Integer:
                     Control.Text = "0";
                     break;
                 case NumericEntryType.Fractional:
@@ -64,34 +66,93 @@ namespace XamarinRenderers.UWP.Renderers
             }
         }
 
-
-        private void Control_TextChanging(Windows.UI.Xaml.Controls.TextBox sender, Windows.UI.Xaml.Controls.TextBoxTextChangingEventArgs args)
+        private void Control_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
+            switch (Type)
+            {
+                case NumericEntryType.Natural:
+                    NaturalTextChanging(sender, args);
+                    break;
+                case NumericEntryType.Integer:
+                    IntegerTextChanging(sender, args);
+                    break;
+                case NumericEntryType.Fractional:
+                    FractionalTextChanging(sender, args);
+                    break;
+            }
+        }
+
+
+        private void NaturalTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            if (long.TryParse(sender.Text, out long value)
+                && value > -1)
+            {
+                if (sender.Text.First() == '0'
+                    || sender.Text == "-0"
+                    || sender.Text.Contains(" "))
+                {
+                    sender.Text = value.ToString();
+                    sender.Select(sender.Text.Length, 0);
+                    return;
+                }
+
+                return;
+            }
+
             if (string.IsNullOrEmpty(sender.Text))
             {
-                Control.Text = "0";
+                sender.Text = "0";
+                sender.Select(sender.Text.Length, 0);
+                return;
             }
 
-            if (sender.Text.Length == 2 && sender.Text.First() == '0')
-            {
-                Control.Text = sender.Text.Substring(1);
-            }
+            sender.Text = Control.Text;
+            sender.Select(Control.Text.Length, 0);
         }
 
-        private void Control_BeforeTextChanging(Windows.UI.Xaml.Controls.TextBox sender, Windows.UI.Xaml.Controls.TextBoxBeforeTextChangingEventArgs args)
+
+        private void IntegerTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
-            if (int.TryParse(args.NewText, out int value)
-                && (args.NewText.First() != '0' || Control.Text == "0"))
+            if (sender.Text == "-0" 
+                || sender.Text == "0-" 
+                || sender.Text == "-")
             {
+                sender.Text = "-";
+                sender.Select(sender.Text.Length, 0);
                 return;
             }
 
-            if (string.IsNullOrEmpty(args.NewText) && !string.Equals(sender.Text, "0"))
+            if (long.TryParse(sender.Text, out long value))
             {
+                if (sender.Text.First() == '0'
+                    || sender.Text.StartsWith("-0")
+                    || sender.Text.Contains(" "))
+                {
+                    sender.Text = value.ToString();
+                    sender.Select(sender.Text.Length, 0);
+                    return;
+                }
+
                 return;
             }
 
-            args.Cancel = true;
+            if (string.IsNullOrEmpty(sender.Text))
+            {
+                sender.Text = "0";
+                sender.Select(sender.Text.Length, 0);
+                return;
+            }
+
+            sender.Text = Control.Text;
+            sender.Select(Control.Text.Length, 0);
         }
+
+        private void FractionalTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+
+        }
+
+
     }
 }

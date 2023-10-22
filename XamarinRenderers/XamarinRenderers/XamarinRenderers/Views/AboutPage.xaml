@@ -10,23 +10,30 @@
         <vm:AboutViewModel />
     </ContentPage.BindingContext>
 
-    <StackLayout>
-        <Label Text="Numeric Entry" 
-               FontSize="Medium"
-               HorizontalOptions="Center"/>
-        <Label Text="String" />
-        <controls:NumericEntry x:Name="NumberInt"
-                               Text="{Binding NumericString}"
-                               Placeholder="String"
-                               NumericType="Natural" />
-        <Label Text="Int" />
-        <controls:NumericEntry x:Name="NumberString"
-                               Text="{Binding NumericInt}"
-                               Placeholder="Int"
-                               NumericType="Integers" />
-        <Button Command="{Binding TestCommand}" />
+    <Grid RowDefinitions="9*,*">
+        <StackLayout Grid.Row="0">
+            <Label Text="Numeric Entry"
+                   FontSize="Medium"
+                   HorizontalOptions="Center" />
+            <Label Text="String" />
+            <controls:NumericEntry x:Name="NumberInt"
+                                   Text="{Binding NumericString}"
+                                   Placeholder="String"
+                                   NumericType="Natural" />
+            <Label Text="Int" />
+            <controls:NumericEntry x:Name="NumberString"
+                                   Text="{Binding NumericInt}"
+                                   Placeholder="Int"
+                                   NumericType="Natural" />
+            <Button x:Name="EntryTypeButton"
+                    Clicked="Button_Clicked" />
+        </StackLayout>
 
-        <Button Clicked="Button_Clicked" />
-    </StackLayout>
+        <StackLayout Grid.Row="1">
+            <Button Text="Test"
+                    Command="{Binding TestCommand}" />
+        </StackLayout>
+
+    </Grid>
 
 </ContentPage>

@@ -10,12 +10,22 @@ namespace XamarinRenderers.Views
         public AboutPage()
         {
             InitializeComponent();
+            EntryTypeButton.Text = NumberString.NumericType.ToString();
         }
 
         private void Button_Clicked(object sender, EventArgs e)
         {
-            NumberString.NumericType = Controls.NumericEntryType.Fractional;
-            NumberInt.NumericType = Controls.NumericEntryType.Fractional;
+            var number = NumberString.NumericType;
+            number++;
+
+            if(number > Controls.NumericEntryType.Fractional)
+            {
+                number = 0;
+            }
+
+            NumberString.NumericType = number;
+            NumberInt.NumericType = number;
+            EntryTypeButton.Text = number.ToString();
         }
     }
 }
