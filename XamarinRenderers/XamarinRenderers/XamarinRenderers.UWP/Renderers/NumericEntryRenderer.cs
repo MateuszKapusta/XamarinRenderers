@@ -49,6 +49,7 @@ namespace XamarinRenderers.UWP.Renderers
                 && sender is NumericEntry numericEntry)
             {
                 Type = numericEntry.NumericType;
+                ResetDefaultValue();
             }
         }
 
@@ -56,11 +57,12 @@ namespace XamarinRenderers.UWP.Renderers
         {
             switch (Type)
             {
-                case NumericEntryType.Natural:
-                case NumericEntryType.Integer:
+                case NumericEntryType.LongValue:
+                case NumericEntryType.LongPositiveValue:
                     Control.Text = "0";
                     break;
-                case NumericEntryType.Fractional:
+                case NumericEntryType.DoubleValue:
+                case NumericEntryType.DoublePositiveValue:
                     Control.Text = "0.0";
                     break;
             }
@@ -70,52 +72,25 @@ namespace XamarinRenderers.UWP.Renderers
         {
             switch (Type)
             {
-                case NumericEntryType.Natural:
-                    NaturalTextChanging(sender, args);
+                case NumericEntryType.LongValue:
+                    LongTextChanging(sender, args);
                     break;
-                case NumericEntryType.Integer:
-                    IntegerTextChanging(sender, args);
+                case NumericEntryType.LongPositiveValue:
+                    LongPositiveTextChanging(sender, args);
                     break;
-                case NumericEntryType.Fractional:
-                    FractionalTextChanging(sender, args);
+                case NumericEntryType.DoubleValue:
+                    DoubleTextChanging(sender, args);
+                    break;
+                case NumericEntryType.DoublePositiveValue:
+                    DoublePositiveTextChanging(sender, args);
                     break;
             }
         }
 
-
-        private void NaturalTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        private void LongTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
-            if (long.TryParse(sender.Text, out long value)
-                && value > -1)
-            {
-                if (sender.Text.First() == '0'
-                    || sender.Text == "-0"
-                    || sender.Text.Contains(" "))
-                {
-                    sender.Text = value.ToString();
-                    sender.Select(sender.Text.Length, 0);
-                    return;
-                }
-
-                return;
-            }
-
-            if (string.IsNullOrEmpty(sender.Text))
-            {
-                sender.Text = "0";
-                sender.Select(sender.Text.Length, 0);
-                return;
-            }
-
-            sender.Text = Control.Text;
-            sender.Select(Control.Text.Length, 0);
-        }
-
-
-        private void IntegerTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
-        {
-            if (sender.Text == "-0" 
-                || sender.Text == "0-" 
+            if (sender.Text == "-0"
+                || sender.Text == "0-"
                 || sender.Text == "-")
             {
                 sender.Text = "-";
@@ -148,9 +123,68 @@ namespace XamarinRenderers.UWP.Renderers
             sender.Select(Control.Text.Length, 0);
         }
 
-        private void FractionalTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+
+        private void LongPositiveTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            if (long.TryParse(sender.Text, out long value)
+                && value >= 0)
+            {
+                if (sender.Text.First() == '0'
+                    || sender.Text == "-0"
+                    || sender.Text.Contains(" "))
+                {
+                    sender.Text = value.ToString();
+                    sender.Select(sender.Text.Length, 0);
+                    return;
+                }
+
+                return;
+            }
+
+            if (string.IsNullOrEmpty(sender.Text))
+            {
+                sender.Text = "0";
+                sender.Select(sender.Text.Length, 0);
+                return;
+            }
+
+            sender.Text = Control.Text;
+            sender.Select(Control.Text.Length, 0);
+        }
+
+
+        private void DoubleTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
 
+        }
+
+        private void DoublePositiveTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            if (Double.TryParse(sender.Text, out double value)
+                && value >= 0)
+            {
+                if ((sender.Text.First() == '0' && sender.Text.Length >= 2 && sender.Text[1] != '.')
+                    || sender.Text == "-0"
+                    || sender.Text.Contains(" "))
+                {
+                    sender.Text = value.ToString();
+                    sender.Select(sender.Text.Length, 0);
+                    return;
+                }
+
+                return;
+            }
+
+
+            if (string.IsNullOrEmpty(sender.Text))
+            {
+                sender.Text = "0";
+                sender.Select(sender.Text.Length, 0);
+                return;
+            }
+
+            sender.Text = Control.Text;
+            sender.Select(Control.Text.Length, 0);
         }
 
 

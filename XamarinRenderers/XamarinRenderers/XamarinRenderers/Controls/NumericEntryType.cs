@@ -6,8 +6,9 @@ namespace XamarinRenderers.Controls
 {
     public enum NumericEntryType
     {
-        Natural,
-        Integer,
-        Fractional
+        LongValue,
+        LongPositiveValue,
+        DoubleValue,
+        DoublePositiveValue,
     }
 }

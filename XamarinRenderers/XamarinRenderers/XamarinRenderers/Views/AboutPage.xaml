@@ -19,12 +19,12 @@
             <controls:NumericEntry x:Name="NumberInt"
                                    Text="{Binding NumericString}"
                                    Placeholder="String"
-                                   NumericType="Natural" />
+                                   NumericType="LongValue" />
             <Label Text="Int" />
             <controls:NumericEntry x:Name="NumberString"
                                    Text="{Binding NumericInt}"
                                    Placeholder="Int"
-                                   NumericType="Natural" />
+                                   NumericType="LongValue" />
             <Button x:Name="EntryTypeButton"
                     Clicked="Button_Clicked" />
         </StackLayout>
