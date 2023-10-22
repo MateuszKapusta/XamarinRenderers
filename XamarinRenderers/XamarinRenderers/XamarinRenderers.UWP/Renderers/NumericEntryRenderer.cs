@@ -102,6 +102,7 @@ namespace XamarinRenderers.UWP.Renderers
 
         private void LongTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
+
             if (sender.Text == "-0"
                 || sender.Text == "0-"
                 || sender.Text == "-")
@@ -159,7 +160,39 @@ namespace XamarinRenderers.UWP.Renderers
 
         private void DecimalTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
+            if (sender.Text == "-0"
+                || sender.Text == "0-"
+                || sender.Text == "-")
+            {
+                sender.Text = "-";
+                sender.Select(sender.Text.Length, 0);
+                return;
+            }
 
+            if (decimal.TryParse(sender.Text, out decimal value))
+            {
+                var senderPositionTmp = sender.SelectionStart + sender.SelectionLength;
+                var cleanValue = value.ToString();
+
+                if (sender.Text.Last() == '.')
+                {
+                    cleanValue += ".";
+                }
+
+                sender.Text = cleanValue;
+                sender.SelectionStart = cleanValue.Length < senderPositionTmp ? cleanValue.Length : senderPositionTmp;
+                return;
+            }
+
+            if (string.IsNullOrEmpty(sender.Text))
+            {
+                sender.Text = "0";
+                sender.SelectionStart = 1;
+                return;
+            }
+
+            sender.Text = Control.Text;
+            sender.SelectionStart = ControlOldPosition - 1;
         }
 
         private void DecimalPositiveTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
@@ -167,28 +200,28 @@ namespace XamarinRenderers.UWP.Renderers
             if (decimal.TryParse(sender.Text, out decimal value)
                 && value >= 0)
             {
-                if ((sender.Text.First() == '0' && sender.Text.Length >= 2 && sender.Text[1] != '.')
-                    || sender.Text == "-0"
-                    || sender.Text.Contains(" "))
+                var senderPositionTmp = sender.SelectionStart + sender.SelectionLength;
+                var cleanValue = value.ToString();
+
+                if (sender.Text.Last() == '.')
                 {
-                    sender.Text = value.ToString();
-                    sender.Select(sender.Text.Length, 0);
-                    return;
+                    cleanValue += ".";
                 }
 
+                sender.Text = cleanValue;
+                sender.SelectionStart = cleanValue.Length < senderPositionTmp ? cleanValue.Length : senderPositionTmp;
                 return;
             }
-
 
             if (string.IsNullOrEmpty(sender.Text))
             {
                 sender.Text = "0";
-                sender.Select(sender.Text.Length, 0);
+                sender.SelectionStart = 1;
                 return;
             }
 
             sender.Text = Control.Text;
-            sender.Select(Control.Text.Length, 0);
+            sender.SelectionStart = ControlOldPosition - 1;
         }
 
 
