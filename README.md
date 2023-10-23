@@ -1,3 +1,3 @@
 # XamarinRenderers
 
-Base for cusotm renderers for xamarin project
+Base for cusotm renderers for xamarin projects
