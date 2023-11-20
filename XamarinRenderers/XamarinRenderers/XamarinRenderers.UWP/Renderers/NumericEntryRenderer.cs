@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,9 @@ namespace XamarinRenderers.UWP.Renderers
     public class NumericEntryRenderer : EntryRenderer
     {
         protected NumericEntryType Type { get; set; }
+        protected int Min { get; set; }
+        protected int Max { get; set; }
+        protected int DecimalPoint { get; set; }
         private int ControlOldPosition;
 
 
@@ -24,24 +28,19 @@ namespace XamarinRenderers.UWP.Renderers
             base.OnElementChanged(e);
 
             if (e.NewElement != null
-                && e.NewElement is NumericEntry numericEntry)
+                && e.NewElement is NumericEntry numericEntry
+                && Control != null)
             {
-                if (Control != null)
-                {
-                    Type = numericEntry.NumericType;
-                    ResetDefaultValue();
-                    Control.TextChanging += Control_TextChanging;
-                    Control.SelectionChanging += Control_SelectionChanging;
-                }
-            }
+                Control.TextChanging -= Control_TextChanging;
+                Control.SelectionChanging -= Control_SelectionChanging;
 
-            if (e.OldElement != null)
-            {
-                if (Control != null)
-                {
-                    Control.TextChanging -= Control_TextChanging;
-                    Control.SelectionChanging -= Control_SelectionChanging;
-                }
+                Type = numericEntry.NumericType;
+                Min = numericEntry.MinValue;
+                Max = numericEntry.MaxValue;
+                DecimalPoint = numericEntry.DecimalPoint;
+                ResetDefaultValue();
+                Control.TextChanging += Control_TextChanging;
+                Control.SelectionChanging += Control_SelectionChanging;
             }
         }
 
@@ -57,11 +56,24 @@ namespace XamarinRenderers.UWP.Renderers
         {
             base.OnElementPropertyChanged(sender, e);
 
-            if (string.Equals(e.PropertyName, nameof(NumericEntry.NumericTypeProperty))
-                && sender is NumericEntry numericEntry)
+            if (sender is NumericEntry numericEntry)
             {
-                Type = numericEntry.NumericType;
-                ResetDefaultValue();
+                switch (e.PropertyName)
+                {
+                    case nameof(NumericEntry.NumericType):
+                        Type = numericEntry.NumericType;
+                        ResetDefaultValue();
+                        break;
+                    case nameof(NumericEntry.MaxValue):
+                        Max = numericEntry.MaxValue;
+                        break;
+                    case nameof(NumericEntry.MinValue):
+                        Min = numericEntry.MinValue;
+                        break;
+                    case nameof(NumericEntry.DecimalPoint):
+                        DecimalPoint = numericEntry.DecimalPoint;
+                        break;
+                }
             }
         }
 
@@ -112,7 +124,8 @@ namespace XamarinRenderers.UWP.Renderers
                 return;
             }
 
-            if (long.TryParse(sender.Text, out long value))
+            if (long.TryParse(sender.Text, out long value)
+                && ValueFromMinMaxRange(value))
             {
                 var senderPositionTmp = sender.SelectionStart + sender.SelectionLength;
                 var cleanValue = value.ToString();
@@ -128,8 +141,7 @@ namespace XamarinRenderers.UWP.Renderers
                 return;
             }
 
-            sender.Text = Control.Text;
-            sender.SelectionStart = ControlOldPosition - 1;
+            ResetToOldValues(sender);
         }
 
 
@@ -137,7 +149,8 @@ namespace XamarinRenderers.UWP.Renderers
         {
 
             if (long.TryParse(sender.Text, out long value)
-                && value >= 0)
+                && value >= 0
+                && ValueFromMinMaxRange(value))
             {
                 var senderPositionTmp = sender.SelectionStart + sender.SelectionLength;
                 var cleanValue = value.ToString();
@@ -153,8 +166,7 @@ namespace XamarinRenderers.UWP.Renderers
                 return;
             }
 
-            sender.Text = Control.Text;
-            sender.SelectionStart = ControlOldPosition - 1;
+            ResetToOldValues(sender);
         }
 
 
@@ -169,7 +181,8 @@ namespace XamarinRenderers.UWP.Renderers
                 return;
             }
 
-            if (decimal.TryParse(sender.Text, out decimal value))
+            if (decimal.TryParse(sender.Text, out decimal value)
+                && ValueFromMinMaxRange(value))
             {
                 var senderPositionTmp = sender.SelectionStart + sender.SelectionLength;
                 var cleanValue = value.ToString();
@@ -191,14 +204,14 @@ namespace XamarinRenderers.UWP.Renderers
                 return;
             }
 
-            sender.Text = Control.Text;
-            sender.SelectionStart = ControlOldPosition - 1;
+            ResetToOldValues(sender);
         }
 
         private void DecimalPositiveTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
             if (decimal.TryParse(sender.Text, out decimal value)
-                && value >= 0)
+                && value >= 0
+                && ValueFromMinMaxRange(value))
             {
                 var senderPositionTmp = sender.SelectionStart + sender.SelectionLength;
                 var cleanValue = value.ToString();
@@ -220,10 +233,31 @@ namespace XamarinRenderers.UWP.Renderers
                 return;
             }
 
+            ResetToOldValues(sender);
+        }
+
+        private void ResetToOldValues(TextBox sender)
+        {
             sender.Text = Control.Text;
             sender.SelectionStart = ControlOldPosition - 1;
         }
 
+        private bool ValueFromMinMaxRange(decimal value)
+        {
+            if (value < Min || value > Max)
+            {
+                return false;
+            }
 
+            if (value.ToString(CultureInfo.InvariantCulture)
+                     .SkipWhile(x => x != '.')
+                     .Skip(1)
+                     .Count() > DecimalPoint)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
