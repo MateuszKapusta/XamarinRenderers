@@ -22,17 +22,32 @@
             <controls:NumericEntry x:Name="NumberString"
                                    Text="{Binding NumericString}"
                                    Placeholder="String"
-                                   NumericType="LongValue" />
+                                   NumericType="LongValue"
+                                   MinValue="{Binding Source={Reference MinValue}, Path=Text}"
+                                   MaxValue="{Binding Source={Reference MaxValue}, Path=Text}" />
             <Label Text="Long" />
             <controls:NumericEntry x:Name="NumberLong"
                                    Text="{Binding NumericLong}"
                                    Placeholder="Long"
-                                   NumericType="LongValue" />
+                                   NumericType="LongValue"
+                                   MinValue="{Binding Source={Reference MinValue}, Path=Text}"
+                                   MaxValue="{Binding Source={Reference MaxValue}, Path=Text}" />
             <Label Text="Decimal" />
             <controls:NumericEntry x:Name="NumberDecimal"
                                    Text="{Binding NumericDecimal}"
                                    Placeholder="Decimal"
-                                   NumericType="LongValue" />
+                                   NumericType="LongValue"
+                                   MinValue="{Binding Source={Reference MinValue}, Path=Text}"
+                                   MaxValue="{Binding Source={Reference MaxValue}, Path=Text}" />
+            <StackLayout Orientation="Horizontal">
+                <Entry x:Name="MinValue"
+                       Placeholder="Min" 
+                       Text="0"/>
+                <Entry x:Name="MaxValue"
+                       Placeholder="Max" 
+                       Text="100"/>
+            </StackLayout>
+
             <Button x:Name="EntryTypeButton"
                     Clicked="Button_Clicked" />
         </StackLayout>
